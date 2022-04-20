@@ -1,0 +1,31 @@
+---create database--
+create or replace database RAJESH;
+USE RAJESH;
+CREATE OR REPLACE SCHEMA JSON;
+--create table for load the data--
+create or replace table RAW_JASON(raw_column variant);
+--upload the data in stage--
+put file://E:\data\EmployeeData.json @%RAW_JASON;
+--LIST--
+LIST @%RAW_JSON;
+--Load the data--
+copy into RAW_JASON from '@%RAW_JASON/EmployeeData.json' file_format=(type=JSON);
+--checking--
+USE RAJESH;
+USE SCHEMA JSON;
+select * from RAW_JASON;
+
+
+--create table from JSON data--
+create or replace table FORMATTED_JSON (ABOUT,NAME,EMAIL,PASSWORDS,CREATEDAT,UPDATEDAT)
+AS
+select RAW_COLUMN:about::string,
+RAW_COLUMN:name::string,
+RAW_COLUMN:email::string,
+RAW_COLUMN:password::string,
+RAW_COLUMN:createdAt::timestamp,
+RAW_COLUMN:updatedAt::timestamp
+from "RAJESH"."JSON"."RAW_JASON";
+
+---querying data---
+select * from formatted_json;
